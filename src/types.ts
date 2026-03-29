@@ -60,6 +60,34 @@ export interface Post {
   type: 'achievement' | 'update' | 'moment';
 }
 
+export interface AIBuddy {
+  name: string;
+  level: number;
+  xp: number;
+  nextLevelXp: number;
+  personality: string[];
+  achievements: { id: string; title: string; icon: React.ReactNode; date: string }[];
+  customization: {
+    color: string;
+    accessory: string;
+    voice: string;
+  };
+}
+
+export interface UserProfile {
+  id: string;
+  username: string;
+  avatar: string;
+  bio: string;
+  joinedDate: string;
+  buddy: AIBuddy;
+  stats: {
+    gamesPlayed: number;
+    messagesSent: number;
+    loungeTime: string;
+  };
+}
+
 export interface TechMechanism {
   title: string;
   description: string;

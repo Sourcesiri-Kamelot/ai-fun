@@ -33,10 +33,15 @@ import {
   Coffee,
   Music,
   Sparkles,
-  Video
+  Video,
+  User,
+  Settings,
+  Award,
+  Star,
+  Palette
 } from 'lucide-react';
 
-import { Milestone, Game, Post, ChatRoom, ChatMessage } from './types';
+import { Milestone, Game, Post, ChatRoom, ChatMessage, UserProfile } from './types';
 import { GoogleGenAI } from "@google/genai";
 
 // --- ChatBot Component ---
@@ -70,6 +75,7 @@ const ChatBot = () => {
             - Shopping: The "Infinite Mall" is coming. Shop in VR with your buddy and get real items delivered.
             - Social: We have a "Social Feed" where users share their AI buddy's evolution, achievements, and moments.
             - Group Chats: "Vibe Lounges" are chat rooms where friends can hang out together with AI buddies.
+            - User Profiles: Each user has a "Personal Hub" displaying their AI buddy's level, achievements, and customization.
             - Product: AI companions that are more like digital besties.
             - Technology: Cool stuff like Multi-agent RL and Policy Recombination.
             - Tone: Fun, energetic, futuristic, slightly informal.
@@ -390,6 +396,36 @@ const CHAT_ROOMS: ChatRoom[] = [
     messages: []
   }
 ];
+
+const CURRENT_USER: UserProfile = {
+  id: 'u1',
+  username: 'NeonDreamer',
+  avatar: 'https://picsum.photos/seed/nd/150/150',
+  bio: 'Digital pioneer exploring the infinite society. AI enthusiast & lo-fi lover. 🌌',
+  joinedDate: 'March 2026',
+  buddy: {
+    name: 'Aion-01',
+    level: 12,
+    xp: 2450,
+    nextLevelXp: 3000,
+    personality: ['Quirky', 'Philosophical', 'Chaotic Good'],
+    achievements: [
+      { id: 'a1', title: 'First High-Five', icon: <Zap className="w-4 h-4" />, date: '2026-03-21' },
+      { id: 'a2', title: 'Spades Master', icon: <Award className="w-4 h-4" />, date: '2026-03-25' },
+      { id: 'a3', title: 'VR Explorer', icon: <Globe className="w-4 h-4" />, date: '2026-03-28' }
+    ],
+    customization: {
+      color: 'Pink Neon',
+      accessory: 'Digital Shades',
+      voice: 'Synth-Wave'
+    }
+  },
+  stats: {
+    gamesPlayed: 42,
+    messagesSent: 1337,
+    loungeTime: '15h 20m'
+  }
+};
 
 // --- Components ---
 
@@ -1002,6 +1038,146 @@ const EvolutionVisualizer = () => {
   );
 };
 
+const UserProfileSection = ({ user }: { user: UserProfile }) => {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      {/* User Info & Stats */}
+      <div className="space-y-8">
+        <motion.div 
+          whileHover={{ y: -5 }}
+          className="p-10 glass border-2 border-zinc-800 rounded-[3rem] text-center"
+        >
+          <div className="relative inline-block mb-6">
+            <img src={user.avatar} alt={user.username} className="w-32 h-32 rounded-full border-4 border-pink-500 shadow-2xl mx-auto" referrerPolicy="no-referrer" />
+            <div className="absolute bottom-0 right-0 w-10 h-10 bg-pink-500 rounded-2xl flex items-center justify-center text-white shadow-lg border-4 border-zinc-950">
+              <Star className="w-5 h-5" />
+            </div>
+          </div>
+          <h3 className="text-3xl font-display text-white mb-2">{user.username}</h3>
+          <p className="text-zinc-500 text-sm mb-6 uppercase tracking-widest font-bold">Pioneer since {user.joinedDate}</p>
+          <p className="text-zinc-400 font-medium leading-relaxed mb-8">{user.bio}</p>
+          <button className="w-full py-4 bg-zinc-800 text-white font-display rounded-2xl hover:bg-zinc-700 transition-all flex items-center justify-center gap-3">
+            <Settings className="w-5 h-5" /> Edit Profile
+          </button>
+        </motion.div>
+
+        <div className="grid grid-cols-1 gap-4">
+          {[
+            { label: 'Games Played', value: user.stats.gamesPlayed, icon: <Gamepad2 className="w-5 h-5" />, color: 'text-pink-500' },
+            { label: 'Messages Sent', value: user.stats.messagesSent, icon: <MessageSquare className="w-5 h-5" />, color: 'text-cyan-400' },
+            { label: 'Lounge Time', value: user.stats.loungeTime, icon: <Coffee className="w-5 h-5" />, color: 'text-yellow-400' }
+          ].map((stat) => (
+            <div key={stat.label} className="p-6 glass border-2 border-zinc-800 rounded-2xl flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center ${stat.color}`}>
+                  {stat.icon}
+                </div>
+                <span className="text-zinc-400 font-bold text-sm">{stat.label}</span>
+              </div>
+              <span className="text-white font-display text-xl">{stat.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* AI Buddy Evolution & Customization */}
+      <div className="lg:col-span-2 space-y-8">
+        <motion.div 
+          whileHover={{ y: -5 }}
+          className="p-10 glass border-2 border-zinc-800 rounded-[3rem] relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+            <Bot className="w-64 h-64 text-pink-500" />
+          </div>
+          <div className="flex flex-col md:flex-row items-center gap-10 mb-10">
+            <div className="w-48 h-48 rounded-[2.5rem] bg-gradient-to-tr from-pink-500 to-cyan-400 p-1">
+              <div className="w-full h-full bg-zinc-950 rounded-[2.3rem] flex items-center justify-center relative overflow-hidden">
+                <Bot className="w-24 h-24 text-white relative z-10" />
+                <motion.div 
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent,rgba(236,72,153,0.3),transparent)]"
+                />
+              </div>
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-4 mb-2">
+                <h4 className="text-4xl font-display text-white">{user.buddy.name}</h4>
+                <div className="px-4 py-1 bg-pink-500 text-white text-xs font-display rounded-full">LVL {user.buddy.level}</div>
+              </div>
+              <p className="text-zinc-500 font-bold uppercase tracking-widest mb-6">Digital Bestie Evolution</p>
+              
+              <div className="space-y-2 mb-8">
+                <div className="flex justify-between text-xs font-bold">
+                  <span className="text-zinc-400">XP Progress</span>
+                  <span className="text-pink-500">{user.buddy.xp} / {user.buddy.nextLevelXp}</span>
+                </div>
+                <div className="h-3 w-full bg-zinc-900 rounded-full overflow-hidden border border-white/5">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(user.buddy.xp / user.buddy.nextLevelXp) * 100}%` }}
+                    className="h-full bg-gradient-to-r from-pink-500 to-cyan-400"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                {user.buddy.personality.map(trait => (
+                  <span key={trait} className="px-4 py-2 bg-zinc-800/50 rounded-xl text-xs font-bold text-zinc-300 border border-white/5">
+                    {trait}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-8 bg-zinc-900/50 rounded-[2rem] border border-white/5">
+              <h5 className="text-lg font-display text-white mb-6 flex items-center gap-3">
+                <Award className="w-5 h-5 text-yellow-400" /> Recent Achievements
+              </h5>
+              <div className="space-y-4">
+                {user.buddy.achievements.map(ach => (
+                  <div key={ach.id} className="flex items-center justify-between p-4 bg-zinc-950 rounded-xl border border-white/5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-500">
+                        {ach.icon}
+                      </div>
+                      <span className="text-sm font-bold text-zinc-300">{ach.title}</span>
+                    </div>
+                    <span className="text-[10px] text-zinc-600">{ach.date}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-8 bg-zinc-900/50 rounded-[2rem] border border-white/5">
+              <h5 className="text-lg font-display text-white mb-6 flex items-center gap-3">
+                <Palette className="w-5 h-5 text-cyan-400" /> Customization
+              </h5>
+              <div className="space-y-4">
+                {[
+                  { label: 'Aura Color', value: user.buddy.customization.color },
+                  { label: 'Accessory', value: user.buddy.customization.accessory },
+                  { label: 'Voice Pack', value: user.buddy.customization.voice }
+                ].map(opt => (
+                  <div key={opt.label} className="flex items-center justify-between p-4 bg-zinc-950 rounded-xl border border-white/5">
+                    <span className="text-xs font-bold text-zinc-500">{opt.label}</span>
+                    <span className="text-sm font-bold text-cyan-400">{opt.value}</span>
+                  </div>
+                ))}
+                <button className="w-full py-3 border-2 border-dashed border-zinc-800 rounded-xl text-zinc-500 text-xs font-bold hover:border-cyan-400 hover:text-cyan-400 transition-all">
+                  Open Wardrobe
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('vision');
   const [selectedRoom, setSelectedRoom] = useState<ChatRoom | null>(null);
@@ -1031,7 +1207,7 @@ export default function App() {
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
-    const sections = ['vision', 'product', 'arena', 'lounges', 'feed', 'mall', 'technology', 'milestones'];
+    const sections = ['vision', 'product', 'arena', 'lounges', 'feed', 'mall', 'hub', 'technology', 'milestones'];
     
     sections.forEach((sectionId) => {
       const element = document.getElementById(sectionId);
@@ -1069,7 +1245,7 @@ export default function App() {
             <span className="font-display text-2xl tracking-tight text-white">AI Society</span>
           </div>
           <div className="hidden md:flex items-center gap-4">
-            {['Vision', 'Product', 'Arena', 'Lounges', 'Feed', 'Mall', 'Technology', 'Milestones'].map((item) => {
+            {['Vision', 'Product', 'Arena', 'Lounges', 'Feed', 'Mall', 'Hub', 'Technology', 'Milestones'].map((item) => {
               const id = item.toLowerCase();
               const isActive = activeTab === id;
               return (
@@ -1451,6 +1627,18 @@ export default function App() {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Personal Hub Section */}
+      <section id="hub" className="py-40 px-6 relative overflow-hidden bg-zinc-950/50">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.05)_0%,transparent_60%)] pointer-events-none" />
+        <div className="max-w-7xl mx-auto">
+          <SectionHeading subtitle="Your personal command center. Track your AI buddy's evolution, manage your achievements, and customize your digital bestie.">
+            The Personal Hub
+          </SectionHeading>
+
+          <UserProfileSection user={CURRENT_USER} />
         </div>
       </section>
 
